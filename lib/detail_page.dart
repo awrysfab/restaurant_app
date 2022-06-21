@@ -46,8 +46,6 @@ class RestaurantDetailPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                // Text('City: ${restaurant.city}'),
-                // Text('Rating: ${restaurant.rating.toString()}'),
                 const Divider(color: Colors.grey),
                 const Text('Description', style: TextStyle(
                   color: Colors.black,

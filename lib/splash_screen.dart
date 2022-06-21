@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:news_app/main.dart';
 
@@ -22,13 +21,17 @@ class _SplashState extends State<Splash> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          FlutterLogo(size:200),
-          // const Text("Findresto",
-          //   style: const TextStyle(
-          //   color: Colors.black,
-          //   fontWeight: FontWeight.bold,
-          //   fontSize: 30,
-          // ),)
+          Column(
+            children: [
+              const Text("Findresto",
+                style: const TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Colors.blueAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                ),)
+            ],
+          )
         ]
     );
   }
