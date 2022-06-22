@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/api/api_service.dart';
 import 'package:news_app/api/restaurant_list.dart';
-import 'package:news_app/detail_page2.dart';
+import 'package:news_app/detail_page.dart';
 import 'package:news_app/splash_screen.dart';
 
 void main() {
