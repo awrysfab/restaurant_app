@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/restaurant.dart';
-import 'package:news_app/detail_page.dart';
+import 'package:news_app/api/api_service.dart';
+import 'package:news_app/api/restaurant_list.dart';
+import 'package:news_app/detail_page2.dart';
 import 'package:news_app/splash_screen.dart';
 
 void main() {
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         Splash.routeName: (context) => Splash(),
         RestaurantsListPage.routeName: (context) => RestaurantsListPage(),
         RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
-            restaurant: ModalRoute.of(context)?.settings.arguments as Restaurant,
+            id: ModalRoute.of(context)?.settings.arguments as String,
         ),
       },
     );
@@ -41,6 +42,14 @@ class RestaurantsListPage extends StatefulWidget{
 class _RestaurantsListPageState extends State<RestaurantsListPage>{
   TextEditingController editingController = TextEditingController();
   String searchString = "";
+  late Future<RestaurantList> _restaurant;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _restaurant = ApiService().restaurantList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,16 +72,32 @@ class _RestaurantsListPageState extends State<RestaurantsListPage>{
                   ),
                   Expanded(
                     flex: 8,
-                    child: FutureBuilder<String>(
-                        future: DefaultAssetBundle.of(context).loadString('/restaurants.json'),
+                    child: FutureBuilder<RestaurantList>(
+                        future: _restaurant,
                         builder: (context, snapshot){
-                          final List<Restaurant> restaurants = parseRestaurants(snapshot.data);
-                          return ListView.builder(
-                            itemCount: restaurants.length,
-                            itemBuilder: (context, index) {
-                              return restaurants[index].name.toLowerCase().contains(searchString.toLowerCase())? _buildRestaurantItem(context, restaurants[index]) : const Text('');
-                            },
-                          );
+                          var state = snapshot.connectionState;
+                          if(state != ConnectionState.done){
+                            return Center(child: CircularProgressIndicator());
+                          }else {
+                            if(snapshot.hasData){
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data?.restaurants.length,
+                                itemBuilder: (context, index) {
+                                  var restaurants = snapshot.data?.restaurants[index];
+                                  if(restaurants!.name.toLowerCase().contains(searchString.toLowerCase())){
+                                    return _buildRestaurantItem(context, restaurants!);
+                                  } else {
+                                    return Text('');
+                                  }
+                                  },
+                              );
+                            } else if(snapshot.hasError){
+                              return Center(child: Text(snapshot.error.toString()));
+                            }else {
+                              return Text('');
+                            }
+                          }
                         }
                     ),
                   ),
@@ -88,14 +113,15 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
   return ListTile(
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     leading: Image.network(
-      restaurant.pictureId,
+      'https://restaurant-api.dicoding.dev/images/small/' + restaurant.pictureId,
+
       width: 100,
     ),
     title: Text(restaurant.name),
     subtitle: Text(restaurant.city),
     onTap: (){
       Navigator.pushNamed(context, RestaurantDetailPage.routeName,
-          arguments: restaurant);
+          arguments: restaurant.id);
     },
   );
 }
